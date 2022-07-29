@@ -1,0 +1,31 @@
+{
+  "name": "apibooks",
+  "version": "1.0.0",
+  "description": "API FOR BOOKS",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "API",
+    "MYSQL"
+  ],
+  "author": "Sergio Maya",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.6",
+    "excel4node": "^1.7.2",
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "mime": "^3.0.0",
+    "moment": "^2.29.1",
+    "mysql": "^2.18.1",
+    "nodemailer": "^6.7.2",
+    "to-words": "^3.2.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  }
+}
