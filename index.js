@@ -18,7 +18,7 @@ app.use((req, res, next) => {
 app.use(cookieParser())
 
 
-//Respuesta de la ruta padre
+/* //Respuesta de la ruta padre
 app.get('/', function(req, res) {
     //Genera la respuesta que se dara
     respuesta = {
@@ -27,7 +27,7 @@ app.get('/', function(req, res) {
         mensaje: 'Punto de inicio'
     };
     res.send(respuesta); //Envia una respuesta
-});
+}); */
 app.use(require("./Routes/authController")); //Genera una ruta para llamarla;
 app.use(require("./Routes/empleoyes")); //Genera una ruta para llamarla;
 app.use(require("./Routes/libros")); //Genera una ruta para llamarla;

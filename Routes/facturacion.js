@@ -17,6 +17,7 @@ const toWords = new ToWords({
         doNotAddOnly: false,
     }
 });
+
 router.get("/api/allDataFacturas/", verifyToken, (req, res) => {
     jwt.verify(req.token, 'secret_token', (error, authData) => {
 

@@ -36,6 +36,47 @@ router.get("/api/cotizaciones/:id", verifyToken, (req, res) => {
                 dataCliente: [],
                 dataLibros: []
             }
+            mysqlConection.query("select cotizacionCliente.* from cotizacionCliente " +
+                "where cotizacionCliente.id_cotizacion =" + id, (err, rows, fields) => {
+                    if (!err) {
+                        obj["dataCliente"] = rows
+                        mysqlConection.query("select detalleCotizacion.*,libros.* from cotizacionCliente"
+                            + " INNER JOIN detalleCotizacion ON cotizacionCliente.id_cotizacion = detalleCotizacion.id_cotizacion"
+                            + " INNER JOIN libros ON libros.idLibro = detalleCotizacion.id_libro where cotizacionCliente.id_cotizacion =" + id, (err, rows, fields) => {
+                                if (!err) {
+                                    //obj["dataLibros"] = rows
+                                    for (let i = 0; i < rows.length; i++) {
+                                        obj["dataLibros"].push({
+                                            "idLibro": rows[i].id_libro,
+                                            "cantidad": rows[i].cantidad,
+                                            "precio": rows[i].precio
+                                        })
+
+                                    }
+                                    let body = obj
+                                    response.success(req, res, false, true, body, 200)
+
+                                } else {
+                                    res.json(err); //Muestra el error
+                                }
+                            });
+                    } else {
+                        res.json(err); //Muestra el error
+                    }
+                });
+        }
+    })
+});
+/* router.get("/api/cotizaciones/:id", verifyToken, (req, res) => {
+    jwt.verify(req.token, 'secret_token', (error, authData) => {
+        if (error) {
+            response.error(req, res, true, false, "Prohibido", 403, "Prohibido")
+        } else {
+            const { id } = req.params;
+            var obj = {
+                dataCliente: [],
+                dataLibros: []
+            }
             mysqlConection.query("select cotizacionCliente.*,cliente.* from cotizacionCliente " +
                 "INNER JOIN cliente ON cotizacionCliente.id_cliente = cliente.idcliente where cotizacionCliente.id_cotizacion =" + id, (err, rows, fields) => {
                     if (!err) {
@@ -44,7 +85,15 @@ router.get("/api/cotizaciones/:id", verifyToken, (req, res) => {
                             + " INNER JOIN detalleCotizacion ON cotizacionCliente.id_cotizacion = detalleCotizacion.id_cotizacion"
                             + " INNER JOIN libros ON libros.idLibro = detalleCotizacion.id_libro where cotizacionCliente.id_cotizacion =" + id, (err, rows, fields) => {
                                 if (!err) {
-                                    obj["dataLibros"] = rows
+                                    //obj["dataLibros"] = rows
+                                    for(let i =0;i<rows.length;i++){
+                                        obj["dataLibros"].push({
+                                            "idLibro":rows[i].id_libro, 
+                                            "cantidad":rows[i].cantidad,
+                                            "precio":rows[i].precio
+                                        })
+
+                                    }
                                     let body = obj
                                     response.success(req, res, false, true, body, 200)
 
@@ -60,6 +109,7 @@ router.get("/api/cotizaciones/:id", verifyToken, (req, res) => {
     })
 });
 
+ */
 router.post("/api/cotizaciones/", verifyToken, (req, res) => {
     jwt.verify(req.token, 'secret_token', (error, authData) => {
         if (error) {
@@ -105,6 +155,52 @@ router.post("/api/cotizaciones/", verifyToken, (req, res) => {
     })
 });
 
+router.put("/api/cotizaciones/:id", verifyToken, (req, res) => {
+    jwt.verify(req.token, 'secret_token', (error, authData) => {
+        if (error) {
+            response.error(req, res, true, false, "Prohibido", 403, "Prohibido")
+        } else {
+            const { id } = req.params;
+            const { dataCliente, dataLibros } = req.body;
+            mysqlConection.query(
+                "delete from detalleCotizacion where id_cotizacion = ?",
+                [id],
+                (err, rows, fields) => {
+                    if (!err) {
+                        var array = []
+                        data = "id_cliente= ?";
+                        array.push(dataCliente[0].id_cliente);
+                        array.push(id);
+                        const query = "update cotizacionCliente set " + data + " where id_cotizacion = ?;";
+                        mysqlConection.query(query, array, (err, rows, fields) => {
+                            if (!err) {
+                                var arrayData = []
+                                for (let i = 0; i < dataLibros.length; i++) {
+                                    let array = [id, dataLibros[i].idLibro, dataLibros[i].cantidad, dataLibros[i].precio]
+                                    arrayData.push(array)
+                                }
+                                const query2 = "INSERT INTO detalleCotizacion (id_cotizacion,id_libro,cantidad,precio) VALUES ?";
+                                mysqlConection.query(query2, [arrayData], (err, rows, fields) => {
+                                    if (!err) {
+                                        console.log(arrayData)
+                                        console.log(query)
+                                        let body = { status: "Actualizado" }
+                                        response.success(req, res, false, true, body, 200)
+                                    } else {
+                                        res.json(err); //Muestra el error
+                                    }
+                                });
+                            } else {
+                                res.json(err); //Muestra el error
+                            }
+                        });
+                    } else {
+                        res.json(err); //Muestra el error
+                    }
+                })
+        }
+    })
+})
 
 router.delete("/api/cotizaciones/:id", verifyToken, (req, res) => {
     jwt.verify(req.token, 'secret_token', (error, authData) => {
