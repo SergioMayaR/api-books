@@ -49,7 +49,8 @@ router.get("/api/cotizaciones/:id", verifyToken, (req, res) => {
                                         obj["dataLibros"].push({
                                             "idLibro": rows[i].id_libro,
                                             "cantidad": rows[i].cantidad,
-                                            "precio": rows[i].precio
+                                            "precio": rows[i].precio,
+                                            "titulo":rows[i].titulo,
                                         })
 
                                     }
