@@ -394,7 +394,7 @@ router.get("/api/marc21/:id", verifyTokenParas, (req, res) => {
                                 ['\n=022  $a '], //2 ISSN
                                 ['\n=035  $a MJS '], //3
                                 ['\n=041  0\$a spa '], //4
-                                ['\n=044  \\\\$a mx'], //5
+                                ['\n=044  \\\\$a '], //5
                                 ['\n=100  1\$a '], //6 AUTOR
                                 ['\n=245  10$a '], //7 TITULO
                                 ['\n=260  \\\\$a '], //8 CADENA DE TEXTO
@@ -408,6 +408,8 @@ router.get("/api/marc21/:id", verifyTokenParas, (req, res) => {
 
                             dataMarc[2] = libro.issn ? dataMarc[2] + libro.issn : dataMarc[2] + '';
 
+                            dataMarc[5] = libro.code_country ? dataMarc[5] + libro.code_country : dataMarc[5] + '';
+                            
                             dataMarc[6] = libro.autor ? dataMarc[6] + libro.autor : dataMarc[6] + '';
 
                             dataMarc[7] = libro.titulo ? dataMarc[7] + libro.titulo : dataMarc[7] + '';
