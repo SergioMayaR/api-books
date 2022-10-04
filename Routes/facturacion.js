@@ -231,6 +231,7 @@ router.get("/api/excelPedido/:id", verifyTokenParas, (req, res) => {
     const queryObject = url.parse(req.url, true).query;
     jwt.verify(queryObject["token"], 'secret_token', (error, authData) => {
         if (error) {
+            console.log(error)
             response.error(req, res, true, false, "Prohibido", 403, "Prohibido")
         } else {
             const { id } = req.params;
@@ -338,6 +339,7 @@ router.get("/api/marc21/:id", verifyTokenParas, (req, res) => {
     const queryObject = url.parse(req.url, true).query;
     jwt.verify(queryObject["token"], 'secret_token', (error, authData) => {
         if (error) {
+            console.log(error)
             response.error(req, res, true, false, "Prohibido", 403, "Prohibido")
         } else {
             const { id } = req.params;
@@ -408,8 +410,8 @@ router.get("/api/marc21/:id", verifyTokenParas, (req, res) => {
 
                             dataMarc[2] = libro.issn ? dataMarc[2] + libro.issn : dataMarc[2] + '';
 
-                            dataMarc[5] = libro.code_country ? dataMarc[5] + libro.code_country : dataMarc[5] + '';
-                            
+                            dataMarc[5] = libro.code_country ? dataMarc[5] + libro.code_country : dataMarc[5] + 'MX';
+
                             dataMarc[6] = libro.autor ? dataMarc[6] + libro.autor : dataMarc[6] + '';
 
                             dataMarc[7] = libro.titulo ? dataMarc[7] + libro.titulo : dataMarc[7] + '';
@@ -448,6 +450,7 @@ router.get("/api/marc21/:id", verifyTokenParas, (req, res) => {
 
 // Authorization: Bearer <token>
 function verifyToken(req, res, next) {
+    console.log(req.headers)
     const bearerHeader = req.headers['authorization'];
     if (typeof bearerHeader !== 'undefined') {
         const bearerToken = bearerHeader.split(" ")[1];
@@ -475,7 +478,7 @@ function createExcelPedido(data, res, facturacion) {
     // Create a new instance of a Workbook class
     var wb = new xl.Workbook({
         defaultFont: {
-            size: 12,
+            size: 10,
             name: 'Times New Roman',
             color: '#000000',
         },
@@ -535,7 +538,7 @@ function createExcelPedido(data, res, facturacion) {
     const price = {
         numberFormat: '$#,##0.00; ($#,##0.00); -',
     }
-    ws.column(2).setWidth(15);
+    ws.column(2).setWidth(18);
     ws.column(3).setWidth(50);
     //(ROW,COL)
     ws.cell(2, 1).string('Date:').style(centerText)
@@ -578,7 +581,7 @@ function createExcelPedido(data, res, facturacion) {
     for (let i = 0; i < data.length; i++) {
         ws.cell(row, 1).number(data[i].cantidad)
         ws.cell(row, 2).string("").style(centerText)
-        ws.cell(row, 3).string(data[i].titulo)
+        ws.cell(row, 3).string(data[i].titulo).style({ alignment: { wrapText: true}})
         ws.cell(row, 4).number(parseFloat(data[i].precio)).style(price)
         sumTotal += parseFloat(data[i].precio)
         row++
@@ -619,7 +622,7 @@ function createExcelContrato(data, res, facturacion) {
     // Create a new instance of a Workbook class
     var wb = new xl.Workbook({
         defaultFont: {
-            size: 12,
+            size: 10,
             name: 'Times New Roman',
             color: '#000000',
         },
@@ -679,7 +682,7 @@ function createExcelContrato(data, res, facturacion) {
     const price = {
         numberFormat: '$#,##0.00; ($#,##0.00); -',
     }
-    ws.column(2).setWidth(50);
+    ws.column(2).setWidth(60);
     //(ROW,COL)
     ws.cell(2, 1).string('Date:').style(centerText)
     let today = moment().format("DD-MMMM-YYYY");
@@ -719,7 +722,7 @@ function createExcelContrato(data, res, facturacion) {
     for (let i = 0; i < data.length; i++) {
         ws.cell(row, 1).number(data[i].cantidad)
         //ws.cell(row, 2).string("").style(centerText)
-        ws.cell(row, 2).string(data[i].titulo)
+        ws.cell(row, 2).string(data[i].titulo).style({ alignment: { wrapText: true}})
         ws.cell(row, 3).number(parseFloat(data[i].precio)).style(price)
         sumTotal += parseFloat(data[i].precio)
         row++

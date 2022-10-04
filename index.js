@@ -18,7 +18,7 @@ app.use((req, res, next) => {
 app.use(cookieParser())
 
 
-/* //Respuesta de la ruta padre
+ //Respuesta de la ruta padre
 app.get('/', function(req, res) {
     //Genera la respuesta que se dara
     respuesta = {
@@ -27,7 +27,7 @@ app.get('/', function(req, res) {
         mensaje: 'Punto de inicio'
     };
     res.send(respuesta); //Envia una respuesta
-}); */
+}); 
 app.use(require("./Routes/authController")); //Genera una ruta para llamarla;
 app.use(require("./Routes/empleoyes")); //Genera una ruta para llamarla;
 app.use(require("./Routes/libros")); //Genera una ruta para llamarla;
@@ -37,6 +37,7 @@ app.use(require("./Routes/clientes")); //Genera una ruta para llamarla;
 app.use(require("./Routes/contadores")); //Genera una ruta para llamarla;
 app.use(require("./Routes/cotizaciones")); //Genera una ruta para llamarla;
 app.use(require("./Routes/facturacion")); //Genera una ruta para llamarla;
+app.use(require("./Routes/catalogos")); //Genera una ruta para llamarla;
 
 //Para eliminar la cache 
 app.use(function(req, res, next) {

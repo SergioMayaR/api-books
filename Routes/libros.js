@@ -3,7 +3,15 @@ const router = express.Router(); //Obtiene las rutas
 const response = require("../network/response");
 const mysqlConection = require("../database"); //Importa la conexión de database
 const jwt = require("jsonwebtoken");
+const multer = require("multer")
+const fs = require("fs");/* 
+var storage = multer.memoryStorage()
+const upload = multer({ storage: storage }) */
 
+const upload = multer({ dest: 'uploads/' })
+
+const cpUpload = upload.fields([{ name: 'image', maxCount: 1 }])
+const cpUploadLibros = upload.fields([{ name: 'portada', maxCount: 1 },{ name: 'contraportada', maxCount: 1 }])
 //Por el METODO GET  genera una consulta a la bd
 router.get("/api/libros/", verifyToken, (req, res) => {
   jwt.verify(req.token, 'secret_token', (error, authData) => {
@@ -129,7 +137,7 @@ router.post("/api/libros/", verifyToken, (req, res) => {
           } else {
             var dataBody = req.body;
             var dataColums = "";
-            var dataColumsVal=""
+            var dataColumsVal = ""
             var array = [];
             for (var i in dataBody) {
               if (dataBody[i]) {
@@ -137,29 +145,29 @@ router.post("/api/libros/", verifyToken, (req, res) => {
                   dataColums += ",";
                   dataColumsVal += ",";
                 }
-                dataColums += " "+i;
-                dataColumsVal +=" ?";
+                dataColums += " " + i;
+                dataColumsVal += " ?";
                 array.push(dataBody[i]);
               } else if (i == "paginas" || i == "numCopias") {
                 if (dataColums.length != 0) {
                   dataColums += ",";
                   dataColumsVal += ",";
                 }
-                dataColums += " "+i;
-                dataColumsVal +=" ?";
+                dataColums += " " + i;
+                dataColumsVal += " ?";
                 array.push(null);
               } else {
                 if (dataColums.length != 0) {
                   dataColums += ",";
                   dataColumsVal += ",";
                 }
-                dataColums += " "+i;
-                dataColumsVal +=" ?";
+                dataColums += " " + i;
+                dataColumsVal += " ?";
                 array.push("");
               }
             }
 
-            const query = "INSERT INTO libros ("+dataColums+") VALUES ("+dataColumsVal+")";
+            const query = "INSERT INTO libros (" + dataColums + ") VALUES (" + dataColumsVal + ")";
             mysqlConection.query(query, array, (err, rows, fields) => {
               if (!err) {
                 //res.send("Enviado");
@@ -179,15 +187,45 @@ router.post("/api/libros/", verifyToken, (req, res) => {
   })
 });
 
+//Por el METODO POST Guarda un nuevo registro dentro de la BD
+//router.post("/api/libros/", verifyToken, (req, res) => {
+router.post("/api/addImagelibro/", cpUpload, (req, res) => {
+  console.log("-----BODY-------")
+  console.log(req.body)
+  var {id}=req.body
+  console.log(id)
+  console.log("------------")
+  console.log(req.files)
+  req.body.imge={
+    mimetype: req.files["image"][0].mimetype,
+    originalname: req.files["image"][0].originalname
+}
+fs.renameSync(req.files["image"][0].path,"uploads\\"+req.files["image"][0].originalname)
+  /* jwt.verify(req.token, 'secret_token', (error, authData) => {
+    if (error) {
+      response.error(req, res, true, false, "Prohibido", 403, "Prohibido")
+    } else {
+      
+    }
+  }) */
+  let body = { estatus: "Enviado" }
+  response.success(req, res, false, true, body, 200)
+});
+
 //Por medio del METODO PUT se actualiza un registro
-router.put("/api/libros/:isbn", verifyToken, (req, res) => {
+router.put("/api/libros/:isbn", verifyToken,cpUploadLibros, (req, res) => {
   jwt.verify(req.token, 'secret_token', (error, authData) => {
     if (error) {
       response.error(req, res, true, false, "Prohibido", 403, "Prohibido")
     } else {
+      console.log(req.body)
+      console.log(req.files)
+     /*  fs.renameSync(req.files["portada"][0].path,"uploads\\"+req.files["portada"][0].originalname)
+      req.files["portada"][0].path */
 
       const { isbn } = req.params;
       var dataBody = req.body;
+      console.log(dataBody)
       var data = "";
       var array = [];
       for (var i in dataBody) {
@@ -217,12 +255,13 @@ router.put("/api/libros/:isbn", verifyToken, (req, res) => {
       const query = "update libros set " + data + " where idLibro =?;";
       mysqlConection.query(query, array, (err, rows, fields) => {
         if (!err) {
+          
           let body = { status: "Actualizado" }
           response.success(req, res, false, true, body, 200)
           //res.json({ status: "Actualizado" });
         } else {
           console.log(err)
-        }
+        } 
       });
     }
   })

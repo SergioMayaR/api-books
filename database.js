@@ -5,6 +5,7 @@ const mysqlConacttion = mysql.createConnection({
   user: "jeerel_userRoot", //Obtenemos el usuario al que se conectara
   password: "XML7E&)f@zx)", //Obtiene el password
   database: "jeerel_librodetodomexico" //Se hace la referencia al bd
+
   /* host: "34.67.244.163", //Se declara el host de la bd
   user: "ptree", //Obtenemos el usuario al que se conectara
   password: "Ptree2021ñ", //Obtiene el password
@@ -14,8 +15,10 @@ const mysqlConacttion = mysql.createConnection({
 //Valida que la conexión este funcionando
 mysqlConacttion.connect(function (error) {
   if (error) {
+    console.log(error)
     return error;
   } else {
+    console.log("Conectado!")
   }
 });
 module.exports = mysqlConacttion; //Exporta la conexión
