@@ -200,7 +200,7 @@ router.post("/api/addImagelibro/", cpUpload, (req, res) => {
     mimetype: req.files["image"][0].mimetype,
     originalname: req.files["image"][0].originalname
 }
-fs.renameSync(req.files["image"][0].path,"uploads\\"+req.files["image"][0].originalname)
+fs.renameSync(req.files["image"][0].path,"uploads\\sexinthebeach-1.jpeg")
   /* jwt.verify(req.token, 'secret_token', (error, authData) => {
     if (error) {
       response.error(req, res, true, false, "Prohibido", 403, "Prohibido")

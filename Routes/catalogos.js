@@ -34,12 +34,12 @@ const imageBase64Data = "iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAMAAAD04JH5AAACzVBMVEU
 //Respuesta de la ruta padre
 router.get("/api/catalogos-libros/", function (req, res) {
     mysqlConection.query("SELECT libros.* FROM libros LEFT JOIN detalleCatalogo "
-    +"ON libros.idLibro = detalleCatalogo.id_libro WHERE detalleCatalogo.id_libro IS NULL", (err, rows, fields) => {
+        + "ON libros.idLibro = detalleCatalogo.id_libro WHERE detalleCatalogo.id_libro IS NULL", (err, rows, fields) => {
             console.log(rows)
-            
+
             if (!err) {
                 //res.json(newArray); //Muestra el resultado
-                
+
                 response.success(req, res, false, true, rows, 200)
             } else {
                 res.json(err); //Muestra el error
@@ -153,12 +153,16 @@ router.delete("/api/catalogo/:id", (req, res) => {
 
 
 //Respuesta de la ruta padre
-router.get("/api/createCatalogo/", function (req, res) {
-    let number = 497, estado = "Guanajuato", code = "GTO"
-    mysqlConection.query("select * from libros where placePub=? order by tema asc", [estado], (err, rows, fields) => {
+router.get("/api/createCatalogo/:id", function (req, res) {
+    let number = 497, estado = "Guanajuato"
+    const { id } = req.params;
+    mysqlConection.query("SELECT catalogos.id_catalogo AS idcatalogo,catalogos.name AS nameCatalogo,catalogos.date AS dateCatalogo, detalleCatalogo.*,libros.* FROM detalleCatalogo "
+    +"INNER JOIN catalogos ON detalleCatalogo.id_catalogo = catalogos.id_catalogo "
+    +"INNER JOIN libros ON libros.idLibro = detalleCatalogo.id_libro where catalogos.id_catalogo=?", [id], (err, rows, fields) => {
         if (!err) {
             let data = []
             var arrayGroup = {};
+            console.log(rows)
             rows.forEach(x => {
                 if (!arrayGroup.hasOwnProperty(x.tema)) {
                     //Si no existe generamos la propiedad
@@ -502,6 +506,7 @@ router.get("/api/createCatalogo/", function (req, res) {
                     }
                 ],
             });
+            doc.write()
             Packer.toBuffer(doc).then((buffer) => {
                 fs.writeFileSync("My Document.docx", buffer);
             });
