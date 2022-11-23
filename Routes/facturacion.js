@@ -391,40 +391,43 @@ router.get("/api/marc21/:id", verifyTokenParas, (req, res) => {
                             libro.titulo=libro.titulo.replace(/ LAS /g,"").replace(/ Las /g,"").replace(/ las /g,"").replace(/ LAS /g,"")
                             libro.titulo=libro.titulo.replace(/ LOS /g,"").replace(/ Los /g,"").replace(/ los /g,"").replace(/ LOS /g,"")
                             let dataMarc = [
-                                ['=001  $a MJS '], // 0
-                                ['\n=020  \\\\$a '], //1 ISBN
-                                ['\n=022  $a '], //2 ISSN
-                                ['\n=035  $a MJS '], //3
-                                ['\n=041  0\$a spa '], //4
-                                ['\n=044  \\\\$a '], //5
-                                ['\n=100  1\$a '], //6 AUTOR
-                                ['\n=245  10$a '], //7 TITULO
-                                ['\n=260  \\\\$a '], //8 CADENA DE TEXTO
-                                ['\n=300  \\\\$a '], //9 DESCRIP FISICA
-                                ['\n=362  '], //10 ANIO PUBLICACION
-                                ['\n=500  $a '], //11 NOTA GENERAL
-                                ['\n=980  '] //12 FACTURA FECHA ANIO MES DIA
+                                ['=LDR 00457nam a2200121Ia 4500'], //0 
+                                ['\n=008  220425?'+moment().format("YYYY")+'\\\\\\\\MX\\\\\\\\\\\\\\\\\\\\\\\\000\\0\\SPA\\d'], // 1
+                                ['\n=020  \\\\$a '], //2 ISBN   
+                                ['\n=040  \\\\$a mx'], //3
+                                ['\n=100  1\\$a '], //4 AUTOR
+                                ['\n=245  10$a '], //5 TITULO
+                                ['\n=260  2\\$a '], //6 CADENA DE TEXTO
+                                ['\n=300  \\\\$a '], //7 DESCRIP FISICA
+                                ['\n=980  '] //8 FACTURA FECHA ANIO MES DIA
                             ]
 
-                            dataMarc[1] = libro.isbn ? dataMarc[1] + libro.isbn : dataMarc[1] + '';
+                            dataMarc[2] = libro.isbn ? dataMarc[2] + libro.isbn : dataMarc[2] + '';
 
-                            dataMarc[2] = libro.issn ? dataMarc[2] + libro.issn : dataMarc[2] + '';
+                            //dataMarc[2] = libro.issn ? dataMarc[2] + libro.issn : dataMarc[2] + '';
 
-                            dataMarc[5] = libro.code_country ? dataMarc[5] + libro.code_country : dataMarc[5] + 'MX';
+                            //dataMarc[5] = libro.code_country ? dataMarc[5] + libro.code_country : dataMarc[5] + 'MX';
 
-                            dataMarc[6] = libro.autor ? dataMarc[6] + libro.autor : dataMarc[6] + '';
+                            dataMarc[4] = libro.autor ? dataMarc[4] + libro.autor+"." : dataMarc[4] + '';
 
-                            dataMarc[7] = libro.titulo ? dataMarc[7] + libro.titulo : dataMarc[7] + '';
+                            dataMarc[5] = libro.titulo ? dataMarc[5] + libro.titulo+ '.' : dataMarc[5] + '';
 
-                            let pub = libro.placePub ? "$a " + libro.placePub + ' ' : '';
+                            let pub = libro.placePub ? "" + libro.placePub + ' ' : '';
                             pub = libro.editorial ? pub + "$b" + libro.editorial + ' ' : pub;
-                            pub = libro.anio ? pub + '$c ' + libro.anio + ' ' : pub;
-                            dataMarc[8] = pub ? dataMarc[8] + pub : dataMarc[8] + '';
-                            dataMarc[9] = libro.descripcion ? dataMarc[9] + libro.descripcion : dataMarc[9] + '';
-                            dataMarc[10] = libro.anio ? dataMarc[10] + libro.anio : dataMarc[10] + '';
-                            dataMarc[11] = libro.nota ? dataMarc[11] + libro.nota : dataMarc[11] + '';
-                            dataMarc[12] = dataMarc[12] + '\\$a ' + moment(libro.fecha_cotizacion).format("YYYY-MM-DD")+"T00:00:00.000Z" + ' $b ' + libro.precio + " $e " + libro.precio + " $f " + libro.id_cotizacion;
+                            pub = libro.anio ? pub + '$c ' + libro.anio + '' : pub;
+                            dataMarc[6] = pub ? dataMarc[6] + pub + ".": dataMarc[6] + '';
+                            console.log(libro.descripcion)
+                            if(!libro.descripcion){
+                                libro.descripcion=""
+                            }
+                            dataMarc[7] = libro.descripcion ? dataMarc[7] + libro.descripcion+ '.' : dataMarc[7] + '';
+                            //dataMarc[10] = libro.anio ? dataMarc[10] + libro.anio : dataMarc[10] + '';
+                            //dataMarc[11] = libro.nota ? dataMarc[11] + libro.nota : dataMarc[11] + '';
+                            dataMarc[8] = dataMarc[8] + '\\\\$a' + moment(libro.fecha_cotizacion).format("YYYYMMDD") + '$f' + newArray[0].id_cotizacion + "$s" + libro.precio;
 
+                            if(!libro.descripcion){
+                                dataMarc.splice(7,1)
+                            }
                             const reducer = (acumulator, curr) => acumulator + curr;
                             let contenidoLibroMarc = dataMarc.reduce(reducer);
                             contenidoLibroMarc = contenidoLibroMarc + '\n'

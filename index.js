@@ -28,6 +28,13 @@ app.get('/', function(req, res) {
     };
     res.send(respuesta); //Envia una respuesta
 }); 
+
+app.get('/api/img/:img', function(req, res){
+    const { img } = req.params;
+    res.sendFile( __dirname+`/uploads/${img}` );
+});
+
+
 app.use(require("./Routes/authController")); //Genera una ruta para llamarla;
 app.use(require("./Routes/empleoyes")); //Genera una ruta para llamarla;
 app.use(require("./Routes/libros")); //Genera una ruta para llamarla;

@@ -10,8 +10,9 @@ const upload = multer({ storage: storage }) */
 
 const upload = multer({ dest: 'uploads/' })
 
+
 const cpUpload = upload.fields([{ name: 'image', maxCount: 1 }])
-const cpUploadLibros = upload.fields([{ name: 'portada', maxCount: 1 },{ name: 'contraportada', maxCount: 1 }])
+const cpUploadLibros = upload.fields([{ name: 'portada', maxCount: 1 }, { name: 'contraportada', maxCount: 1 }])
 //Por el METODO GET  genera una consulta a la bd
 router.get("/api/libros/", verifyToken, (req, res) => {
   jwt.verify(req.token, 'secret_token', (error, authData) => {
@@ -45,19 +46,22 @@ router.get("/api/libros/:id", verifyToken, (req, res) => {
         (err, rows, fields) => {
           if (!err) {
             let body = rows[0]
-            response.success(req, res, false, true, body, 200)
+            console.log(body)
+            //if(body["pathImgPortada"]){
+            //const base64 = fs.readFileSync("lgoDoc.png", "base64");
+          //}
+          //console.log(base64)
+            response.success(req, res, false, true,body , 200)
             //res.json(rows[0]); //Muestra el resultado
           } else {
             res.json(err); //Muestra el error
           }
-        }
-      );
+        });
     }
   })
 });
 //Por el METODO GET y pasando un valor obtiene un registro por su ID
 router.get("/api/historialLibros/:id", verifyToken, (req, res) => {
-  console.log("ENTRO")
   jwt.verify(req.token, 'secret_token', (error, authData) => {
     if (error) {
       response.error(req, res, true, false, "Prohibido", 403, "Prohibido")
@@ -118,7 +122,6 @@ router.post("/api/libros/", verifyToken, (req, res) => {
                 }
               }
             } else {
-              console.log(rows[i].issn)
               let split = rows[i].issn.split(";")
               for (let j = 0; j < split.length; j++) {
                 let replace = split[j].replace("/ /g", "")
@@ -190,17 +193,12 @@ router.post("/api/libros/", verifyToken, (req, res) => {
 //Por el METODO POST Guarda un nuevo registro dentro de la BD
 //router.post("/api/libros/", verifyToken, (req, res) => {
 router.post("/api/addImagelibro/", cpUpload, (req, res) => {
-  console.log("-----BODY-------")
-  console.log(req.body)
-  var {id}=req.body
-  console.log(id)
-  console.log("------------")
-  console.log(req.files)
-  req.body.imge={
+  var { id } = req.body
+  req.body.imge = {
     mimetype: req.files["image"][0].mimetype,
     originalname: req.files["image"][0].originalname
-}
-fs.renameSync(req.files["image"][0].path,"uploads\\sexinthebeach-1.jpeg")
+  }
+  fs.renameSync(req.files["image"][0].path, "uploads\\" + req.files["image"][0].originalname)
   /* jwt.verify(req.token, 'secret_token', (error, authData) => {
     if (error) {
       response.error(req, res, true, false, "Prohibido", 403, "Prohibido")
@@ -213,56 +211,102 @@ fs.renameSync(req.files["image"][0].path,"uploads\\sexinthebeach-1.jpeg")
 });
 
 //Por medio del METODO PUT se actualiza un registro
-router.put("/api/libros/:isbn", verifyToken,cpUploadLibros, (req, res) => {
+router.put("/api/libros/:isbn", verifyToken, cpUploadLibros, (req, res) => {
   jwt.verify(req.token, 'secret_token', (error, authData) => {
     if (error) {
       response.error(req, res, true, false, "Prohibido", 403, "Prohibido")
     } else {
-      console.log(req.body)
-      console.log(req.files)
-     /*  fs.renameSync(req.files["portada"][0].path,"uploads\\"+req.files["portada"][0].originalname)
-      req.files["portada"][0].path */
+
+      /*  fs.renameSync(req.files["portada"][0].path,"uploads\\"+req.files["portada"][0].originalname)
+       req.files["portada"][0].path */
 
       const { isbn } = req.params;
-      var dataBody = req.body;
-      console.log(dataBody)
-      var data = "";
-      var array = [];
-      for (var i in dataBody) {
-        if (dataBody[i]) {
-          if (data.length != 0) {
-            data += ",";
-          }
-          data += i + "= ?";
-          array.push(dataBody[i]);
-        } else if (i == "paginas" || i == "numCopias") {
-          if (data.length != 0) {
-            data += ",";
-          }
-          data += i + "= ?";
-          array.push(null);
+      mysqlConection.query(
+        "select * from libros where idLibro = ?",
+        [isbn],
+        (err, dataConsulta, fields) => {
+          if (!err) {
+            if (dataConsulta[0]["pathImgPortada"]) {
+              if (req.files["portada"]) {
+                fs.unlinkSync(dataConsulta[0]["pathImgPortada"])
+              }
+            }
+
+            if (dataConsulta[0]["pathImgContraportada"]) {
+              if (req.files["contraportada"]) {
+                fs.unlinkSync(dataConsulta[0]["pathImgContraportada"])
+              }
+            }
+
+            var dataBody = req.body;
+            var data = "";
+            var array = [];
+            for (var i in dataBody) {
+              if (dataBody[i]) {
+                if (data.length != 0) {
+                  data += ",";
+                }
+                data += i + "= ?";
+                array.push(dataBody[i]);
+              } else if (i == "paginas" || i == "numCopias") {
+                if (data.length != 0) {
+                  data += ",";
+                }
+                data += i + "= ?";
+                array.push(null);
 
 
-        } else {
-          if (data.length != 0) {
-            data += ",";
+              } else {
+                if (data.length != 0) {
+                  data += ",";
+                }
+                data += i + "= ?";
+                array.push("");
+              }
+            }
+            if (req.files) {
+              console.log("------req.files--------")
+              if (req.files["portada"]) {
+                let typeSplit = req.files["portada"][0].originalname.split(".")
+                let type = typeSplit[typeSplit.length - 1]
+                let path = "uploads\\portada" + isbn + "." + type
+                fs.renameSync(req.files["portada"][0].path, path)
+                if (data.length != 0) {
+                  data += ",";
+                }
+                data += "pathImgPortada = ?";
+                array.push(__dirname+"/uploads/portada"+ isbn + "." + type);
+
+              }
+              if (req.files["contraportada"]) {
+                let typeSplit = req.files["contraportada"][0].originalname.split(".")
+                let type = typeSplit[typeSplit.length - 1]
+                console.log(type)
+                let path = "uploads\\contraportada" + isbn + "." + type
+                
+                fs.renameSync(req.files["contraportada"][0].path, path)
+                if (data.length != 0) {
+                  data += ",";
+                }
+                data += "pathImgContraportada = ?";
+                array.push(__dirname+"/uploads/contraportada"+ isbn + "." + type);
+              }
+            }
+            array.push(isbn);
+            console.log(data)
+            const query = "update libros set " + data + " where idLibro =?;";
+            mysqlConection.query(query, array, (err, rows, fields) => {
+              if (!err) {
+                let body = { status: "Actualizado" }
+                response.success(req, res, false, true, body, 200)
+              } else {
+                console.log(err)
+              }
+            });
+          } else {
+            res.json(err); //Muestra el error
           }
-          data += i + "= ?";
-          array.push("");
-        }
-      }
-      array.push(isbn);
-      const query = "update libros set " + data + " where idLibro =?;";
-      mysqlConection.query(query, array, (err, rows, fields) => {
-        if (!err) {
-          
-          let body = { status: "Actualizado" }
-          response.success(req, res, false, true, body, 200)
-          //res.json({ status: "Actualizado" });
-        } else {
-          console.log(err)
-        } 
-      });
+        });
     }
   })
 });

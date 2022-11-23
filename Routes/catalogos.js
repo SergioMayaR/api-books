@@ -35,8 +35,6 @@ const imageBase64Data = "iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAMAAAD04JH5AAACzVBMVEU
 router.get("/api/catalogos-libros/", function (req, res) {
     mysqlConection.query("SELECT libros.* FROM libros LEFT JOIN detalleCatalogo "
         + "ON libros.idLibro = detalleCatalogo.id_libro WHERE detalleCatalogo.id_libro IS NULL", (err, rows, fields) => {
-            console.log(rows)
-
             if (!err) {
                 //res.json(newArray); //Muestra el resultado
 
@@ -49,24 +47,24 @@ router.get("/api/catalogos-libros/", function (req, res) {
 
 //Respuesta de la ruta padre
 router.get("/api/catalogos/", function (req, res) {
-    mysqlConection.query("SELECT catalogos.*,detalleCatalogo.*,libros.* FROM detalleCatalogo "
+    var dataAllFacturacion = {}
+    mysqlConection.query("SELECT catalogos.id_catalogo as idCatalogo, catalogos.name,catalogos.date,detalleCatalogo.*,libros.* FROM detalleCatalogo "
         + "INNER JOIN catalogos ON detalleCatalogo.id_catalogo = catalogos.id_catalogo "
         + "INNER JOIN libros ON libros.idLibro = detalleCatalogo.id_libro;", (err, rows, fields) => {
-            console.log(err)
             var arrayGroup = {};
-            console.log(rows)
+
             rows.forEach(x => {
-                if (!arrayGroup.hasOwnProperty(x.id_catalogo)) {
+                if (!arrayGroup.hasOwnProperty(x.idCatalogo)) {
                     //Si no existe generamos la propiedad
-                    arrayGroup[x.id_catalogo] = {
+                    arrayGroup[x.idCatalogo] = {
                         "id_catalogo": x.id_catalogo,
                         "nombre": x.name,
-                        "fecha": x.date,
+                        "fecha": moment(x.date).format("DD/MM/YYYY"),
                         "libros": []
                     };
                 }
 
-                arrayGroup[x.id_catalogo].libros.push(x);
+                arrayGroup[x.idCatalogo].libros.push(x);
             })
             let newArray = []
             for (var i in arrayGroup) {
@@ -75,7 +73,17 @@ router.get("/api/catalogos/", function (req, res) {
             if (!err) {
                 //res.json(newArray); //Muestra el resultado
                 let body = newArray
-                response.success(req, res, false, true, newArray, 200)
+                dataAllFacturacion.catalogos = newArray
+                mysqlConection.query("SELECT libros.* FROM libros LEFT JOIN detalleCatalogo "
+                    + "ON libros.idLibro = detalleCatalogo.id_libro WHERE detalleCatalogo.id_libro IS NULL", (err, rows, fields) => {
+                        if (!err) {
+                            //res.json(newArray); //Muestra el resultado
+                            dataAllFacturacion.libros = rows
+                            response.success(req, res, false, true, dataAllFacturacion, 200)
+                        } else {
+                            res.json(err); //Muestra el error
+                        }
+                    });
             } else {
                 res.json(err); //Muestra el error
             }
@@ -121,7 +129,7 @@ router.post("/api/catalogos/", function (req, res) {
 })
 
 //Por medio del METODO DELETE se elimina un registro
-router.delete("/api/catalogo/:id", (req, res) => {
+router.delete("/api/catalogos/:id", (req, res) => {
     /*  jwt.verify(req.token, 'secret_token', (error, authData) => {
        if (error) {
          response.error(req, res, true, false, "Prohibido", 403, "Prohibido")
@@ -153,16 +161,17 @@ router.delete("/api/catalogo/:id", (req, res) => {
 
 
 //Respuesta de la ruta padre
-router.get("/api/createCatalogo/:id", function (req, res) {
-    let number = 497, estado = "Guanajuato"
-    const { id } = req.params;
-    mysqlConection.query("SELECT catalogos.id_catalogo AS idcatalogo,catalogos.name AS nameCatalogo,catalogos.date AS dateCatalogo, detalleCatalogo.*,libros.* FROM detalleCatalogo "
+router.get("/api/createCatalogo/:number", function (req, res) {
+    console.log(req.params)
+    const { number } = req.params;
+    console.log(number)
+    let  estado = " ", code = " "
+    mysqlConection.query("SELECT catalogos.id_catalogo as idCatalogo, catalogos.name,catalogos.date,detalleCatalogo.*,libros.* FROM detalleCatalogo "
     +"INNER JOIN catalogos ON detalleCatalogo.id_catalogo = catalogos.id_catalogo "
-    +"INNER JOIN libros ON libros.idLibro = detalleCatalogo.id_libro where catalogos.id_catalogo=?", [id], (err, rows, fields) => {
+    +"INNER JOIN libros ON libros.idLibro = detalleCatalogo.id_libro where catalogos.id_catalogo = ?;", [number], (err, rows, fields) => {
         if (!err) {
             let data = []
             var arrayGroup = {};
-            console.log(rows)
             rows.forEach(x => {
                 if (!arrayGroup.hasOwnProperty(x.tema)) {
                     //Si no existe generamos la propiedad
@@ -267,7 +276,7 @@ router.get("/api/createCatalogo/:id", function (req, res) {
                                             })
                                         ],
                                         alignment: AlignmentType.CENTER
-                                    }),
+                                    }),/* 
                                     new Paragraph({
 
                                         children: [
@@ -280,7 +289,7 @@ router.get("/api/createCatalogo/:id", function (req, res) {
                                             }),
                                         ],
                                         alignment: AlignmentType.CENTER,
-                                    }),
+                                    }), */
                                     new Paragraph({
                                         children: [
                                             new TextRun({
@@ -363,7 +372,6 @@ router.get("/api/createCatalogo/:id", function (req, res) {
             for (let i = 0; i < newArray.length; i++) {
                 if (newArray[i].tema) {
                     console.log("------------------")
-                    console.log("newArray[i].tema")
 
                     arrayContenido.push(
                         new Paragraph({
@@ -380,7 +388,6 @@ router.get("/api/createCatalogo/:id", function (req, res) {
                         })
                     )
                     for (let j = 0; j < newArray[i].libros.length; j++) {
-                        console.log("#NTRO")
                         var textoCont = []
                         if (newArray[i].libros[j].autor) {
                             textoCont.push(new TextRun({
@@ -427,8 +434,6 @@ router.get("/api/createCatalogo/:id", function (req, res) {
                                 size: 22
                             }))
                         }
-
-                        console.log(textoCont.length)
                         arrayContenido.push(
                             new Paragraph({
                                 children: textoCont
@@ -486,7 +491,6 @@ router.get("/api/createCatalogo/:id", function (req, res) {
                                                 size: 18,
                                             })]
                                     }),
-
                                     /* new Paragraph({
                                         children: [
 
@@ -506,18 +510,10 @@ router.get("/api/createCatalogo/:id", function (req, res) {
                     }
                 ],
             });
-            doc.write()
             Packer.toBuffer(doc).then((buffer) => {
-                fs.writeFileSync("My Document.docx", buffer);
+                fs.writeFileSync("/tmp/Catalog-" + number+".docx", buffer);
+                res.download("/tmp/Catalog-" + number+".docx");
             });
-            let body = rows
-            //Genera la respuesta que se dara
-            respuesta = {
-                error: true,
-                codigo: 200,
-                msg: newArray
-            };
-            res.send(respuesta); //Envia una respuesta
         } else {
             res.json(err); //Muestra el error
         }
