@@ -198,7 +198,7 @@ router.post("/api/addImagelibro/", cpUpload, (req, res) => {
     mimetype: req.files["image"][0].mimetype,
     originalname: req.files["image"][0].originalname
   }
-  fs.renameSync(req.files["image"][0].path, "uploads\\" + req.files["image"][0].originalname)
+  fs.renameSync(req.files["image"][0].path, "uploads/" + req.files["image"][0].originalname)
   /* jwt.verify(req.token, 'secret_token', (error, authData) => {
     if (error) {
       response.error(req, res, true, false, "Prohibido", 403, "Prohibido")
@@ -269,7 +269,7 @@ router.put("/api/libros/:isbn", verifyToken, cpUploadLibros, (req, res) => {
               if (req.files["portada"]) {
                 let typeSplit = req.files["portada"][0].originalname.split(".")
                 let type = typeSplit[typeSplit.length - 1]
-                let path = "uploads\\portada" + isbn + "." + type
+                let path = "uploads/portada" + isbn + "." + type
                 fs.renameSync(req.files["portada"][0].path, path)
                 if (data.length != 0) {
                   data += ",";
@@ -282,7 +282,7 @@ router.put("/api/libros/:isbn", verifyToken, cpUploadLibros, (req, res) => {
                 let typeSplit = req.files["contraportada"][0].originalname.split(".")
                 let type = typeSplit[typeSplit.length - 1]
                 console.log(type)
-                let path = "uploads\\contraportada" + isbn + "." + type
+                let path = "uploads/contraportada" + isbn + "." + type
                 
                 fs.renameSync(req.files["contraportada"][0].path, path)
                 if (data.length != 0) {
