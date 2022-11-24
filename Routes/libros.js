@@ -229,13 +229,13 @@ router.put("/api/libros/:isbn", verifyToken, cpUploadLibros, (req, res) => {
           if (!err) {
             if (dataConsulta[0]["pathImgPortada"]) {
               if (req.files["portada"]) {
-                fs.unlinkSync(dataConsulta[0]["pathImgPortada"])
+                fs.unlinkSync("uploads/"+dataConsulta[0]["pathImgPortada"])
               }
             }
 
             if (dataConsulta[0]["pathImgContraportada"]) {
               if (req.files["contraportada"]) {
-                fs.unlinkSync(dataConsulta[0]["pathImgContraportada"])
+                fs.unlinkSync("uploads/"+dataConsulta[0]["pathImgContraportada"])
               }
             }
 
@@ -276,7 +276,7 @@ router.put("/api/libros/:isbn", verifyToken, cpUploadLibros, (req, res) => {
                   data += ",";
                 }
                 data += "pathImgPortada = ?";
-                array.push("https://api.librosdetodomexico.com/api/img/portada"+ isbn + "." + type);
+                array.push("portada"+ isbn + "." + type);
 
               }
               if (req.files["contraportada"]) {
@@ -290,7 +290,7 @@ router.put("/api/libros/:isbn", verifyToken, cpUploadLibros, (req, res) => {
                   data += ",";
                 }
                 data += "pathImgContraportada = ?";
-                array.push("https://api.librosdetodomexico.com/api/img/contraportada"+ isbn + "." + type);
+                array.push("contraportada"+ isbn + "." + type);
               }
             }
             array.push(isbn);
