@@ -198,6 +198,7 @@ router.post("/api/addImagelibro/", cpUpload, (req, res) => {
     mimetype: req.files["image"][0].mimetype,
     originalname: req.files["image"][0].originalname
   }
+
   fs.renameSync(req.files["image"][0].path, "uploads/" + req.files["image"][0].originalname)
   /* jwt.verify(req.token, 'secret_token', (error, authData) => {
     if (error) {
@@ -206,7 +207,7 @@ router.post("/api/addImagelibro/", cpUpload, (req, res) => {
       
     }
   }) */
-  let body = { estatus: "Enviado" }
+  let body = { estatus: "Enviado", path:__dirname,paht1:req.files["image"][0].path }
   response.success(req, res, false, true, body, 200)
 });
 
