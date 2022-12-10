@@ -34,7 +34,6 @@ app.get('/api/img/:img', function(req, res){
     res.sendFile( __dirname+`/uploads/${img}` );
 });
 
-
 app.use(require("./Routes/authController")); //Genera una ruta para llamarla;
 app.use(require("./Routes/empleoyes")); //Genera una ruta para llamarla;
 app.use(require("./Routes/libros")); //Genera una ruta para llamarla;

@@ -217,10 +217,6 @@ router.put("/api/libros/:isbn", verifyToken, cpUploadLibros, (req, res) => {
     if (error) {
       response.error(req, res, true, false, "Prohibido", 403, "Prohibido")
     } else {
-
-      /*  fs.renameSync(req.files["portada"][0].path,"uploads\\"+req.files["portada"][0].originalname)
-       req.files["portada"][0].path */
-
       const { isbn } = req.params;
       mysqlConection.query(
         "select * from libros where idLibro = ?",

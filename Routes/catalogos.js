@@ -165,118 +165,118 @@ router.get("/api/createCatalogo/:number", function (req, res) {
     console.log(req.params)
     const { number } = req.params;
     console.log(number)
-    let  estado = " ", code = " "
+    let estado = " ", code = " "
     mysqlConection.query("SELECT catalogos.id_catalogo as idCatalogo, catalogos.name,catalogos.date,detalleCatalogo.*,libros.* FROM detalleCatalogo "
-    +"INNER JOIN catalogos ON detalleCatalogo.id_catalogo = catalogos.id_catalogo "
-    +"INNER JOIN libros ON libros.idLibro = detalleCatalogo.id_libro where catalogos.id_catalogo = ?;", [number], (err, rows, fields) => {
-        if (!err) {
-            let data = []
-            var arrayGroup = {};
-            rows.forEach(x => {
-                if (!arrayGroup.hasOwnProperty(x.tema)) {
-                    //Si no existe generamos la propiedad
-                    arrayGroup[x.tema] = {
-                        "tema": x.tema,
-                        "libros": []
-                    };
+        + "INNER JOIN catalogos ON detalleCatalogo.id_catalogo = catalogos.id_catalogo "
+        + "INNER JOIN libros ON libros.idLibro = detalleCatalogo.id_libro where catalogos.id_catalogo = ?;", [number], (err, rows, fields) => {
+            if (!err) {
+                let data = []
+                var arrayGroup = {};
+                rows.forEach(x => {
+                    if (!arrayGroup.hasOwnProperty(x.tema)) {
+                        //Si no existe generamos la propiedad
+                        arrayGroup[x.tema] = {
+                            "tema": x.tema,
+                            "libros": []
+                        };
+                    }
+
+                    arrayGroup[x.tema].libros.push(x);
+                })
+                let newArray = []
+                for (var i in arrayGroup) {
+                    newArray.push(arrayGroup[i])
                 }
+                const table0 = new Table({
+                    columnWidths: [10505, 10505],
+                    rows: [
+                        new TableRow({
+                            children: [
+                                new TableCell({
+                                    width: {
+                                        size: 9105,
+                                        type: WidthType.DXA,
+                                    },
+                                    height: {
+                                        size: 8565
+                                    },
+                                    children: [
+                                        new Paragraph({
+                                            children: [
+                                                new TextRun({
+                                                    text: "MARTIN DE JESUS SANCHEZ ESPINOSA",
+                                                    color: "008f39",
+                                                    size: 44,
+                                                    bold: true,
+                                                    italics: true
 
-                arrayGroup[x.tema].libros.push(x);
-            })
-            let newArray = []
-            for (var i in arrayGroup) {
-                newArray.push(arrayGroup[i])
-            }
-            const table0 = new Table({
-                columnWidths: [10505, 10505],
-                rows: [
-                    new TableRow({
-                        children: [
-                            new TableCell({
-                                width: {
-                                    size: 9105,
-                                    type: WidthType.DXA,
-                                },
-                                height: {
-                                    size: 8565
-                                },
-                                children: [
-                                    new Paragraph({
-                                        children: [
-                                            new TextRun({
-                                                text: "MARTIN DE JESUS SANCHEZ ESPINOSA",
-                                                color: "008f39",
-                                                size: 44,
-                                                bold: true,
-                                                italics: true
+                                                }),
+                                            ],
+                                            alignment: AlignmentType.CENTER,
+                                        }),
+                                        new Paragraph({
+                                            children: [
+                                                new TextRun({
+                                                    text: "LIBROS DE TODO MEXICO",
+                                                    color: "2740f1",
+                                                    size: 36,
+                                                    bold: true,
+                                                    italics: true
+                                                }),
+                                            ],
+                                            alignment: AlignmentType.CENTER,
+                                        }),
+                                        new Paragraph({
+                                            children: [
+                                                new TextRun({
+                                                    text: "Río Churubusco 230 B-4",
+                                                    color: "520887",
+                                                    size: 22,
+                                                    bold: true,
+                                                    italics: true
+                                                }),
+                                            ],
+                                            alignment: AlignmentType.CENTER,
+                                        }),
+                                        new Paragraph({
+                                            children: [
+                                                new TextRun({
+                                                    text: "Col. San Diego Churubusco, C.P. 04210",
+                                                    color: "520887",
+                                                    size: 22,
+                                                    bold: true,
+                                                    italics: true
+                                                }),
+                                            ],
+                                            alignment: AlignmentType.CENTER,
+                                        }),
+                                        new Paragraph({
+                                            children: [
+                                                new TextRun({
+                                                    text: "Coyoacán, México, D.F.",
+                                                    color: "520887",
+                                                    size: 22,
+                                                    bold: true,
+                                                    italics: true
+                                                }),
+                                            ],
+                                            alignment: AlignmentType.CENTER,
+                                        }),
+                                        //Imagen
+                                        new Paragraph({
+                                            children: [
+                                                new ImageRun({
+                                                    data: fs.readFileSync("lgoDoc.png"),
+                                                    alignment: AlignmentType.CENTER,
+                                                    transformation: {
+                                                        width: 200,
+                                                        height: 200,
+                                                    }
 
-                                            }),
-                                        ],
-                                        alignment: AlignmentType.CENTER,
-                                    }),
-                                    new Paragraph({
-                                        children: [
-                                            new TextRun({
-                                                text: "LIBROS DE TODO MEXICO",
-                                                color: "2740f1",
-                                                size: 36,
-                                                bold: true,
-                                                italics: true
-                                            }),
-                                        ],
-                                        alignment: AlignmentType.CENTER,
-                                    }),
-                                    new Paragraph({
-                                        children: [
-                                            new TextRun({
-                                                text: "Río Churubusco 230 B-4",
-                                                color: "520887",
-                                                size: 22,
-                                                bold: true,
-                                                italics: true
-                                            }),
-                                        ],
-                                        alignment: AlignmentType.CENTER,
-                                    }),
-                                    new Paragraph({
-                                        children: [
-                                            new TextRun({
-                                                text: "Col. San Diego Churubusco, C.P. 04210",
-                                                color: "520887",
-                                                size: 22,
-                                                bold: true,
-                                                italics: true
-                                            }),
-                                        ],
-                                        alignment: AlignmentType.CENTER,
-                                    }),
-                                    new Paragraph({
-                                        children: [
-                                            new TextRun({
-                                                text: "Coyoacán, México, D.F.",
-                                                color: "520887",
-                                                size: 22,
-                                                bold: true,
-                                                italics: true
-                                            }),
-                                        ],
-                                        alignment: AlignmentType.CENTER,
-                                    }),
-                                    //Imagen
-                                    new Paragraph({
-                                        children: [
-                                            new ImageRun({
-                                                data: fs.readFileSync("lgoDoc.png"),
-                                                alignment: AlignmentType.CENTER,
-                                                transformation: {
-                                                    width: 200,
-                                                    height: 200,
-                                                }
-
-                                            })
-                                        ],
-                                        alignment: AlignmentType.CENTER
-                                    }),/* 
+                                                })
+                                            ],
+                                            alignment: AlignmentType.CENTER
+                                        }),/* 
                                     new Paragraph({
 
                                         children: [
@@ -290,234 +290,266 @@ router.get("/api/createCatalogo/:number", function (req, res) {
                                         ],
                                         alignment: AlignmentType.CENTER,
                                     }), */
-                                    new Paragraph({
-                                        children: [
-                                            new TextRun({
-                                                text: "Apartado Postal COM-032, CP 04831",
-                                                color: "520887",
-                                                size: 22,
-                                                bold: true,
-                                                italics: true
-                                            }),
-                                        ],
-                                        alignment: AlignmentType.CENTER,
-                                    }),
-                                    new Paragraph({
-                                        children: [
-                                            new TextRun({
-                                                text: "Tel./Fax: +52 (55) 5688 - 9610",
-                                                color: "520887",
-                                                size: 22,
-                                                bold: true,
-                                                italics: true
-                                            }),
-                                        ],
-                                        alignment: AlignmentType.CENTER,
-                                    }),
-                                    new Paragraph({
-                                        children: [
-                                            new TextRun({
-                                                text: "librosmexicanos@yahoo.com.mx",
-                                                color: "520887",
-                                                size: 22,
-                                                bold: true,
-                                                italics: true
-                                            }),
-                                        ],
-                                        alignment: AlignmentType.CENTER,
-                                    }),
-                                    new Paragraph({
-                                        children: [
-                                            new TextRun({
-                                                text: "Catalog no. " + number,
-                                                color: "2740f1",
-                                                size: 22,
-                                                bold: true,
-                                                italics: true
-                                            }),
-                                        ],
-                                        alignment: AlignmentType.CENTER,
-                                    }),
-                                    new Paragraph({
-                                        children: [
-                                            new TextRun({
-                                                text: estado,
-                                                color: "520887",
-                                                size: 22,
-                                                bold: true,
-                                                italics: true
-                                            }),
-                                        ],
-                                        alignment: AlignmentType.CENTER,
-                                    }),
-                                    new Paragraph({
-                                        children: [
-                                            new TextRun({
-                                                text: "Retrospective & Latest Publications / March 2021",
-                                                color: "520887",
-                                                size: 22,
-                                                bold: true,
-                                                italics: true
-                                            }),
-                                        ],
-                                        alignment: AlignmentType.CENTER,
-                                    }),
-                                ],
-                            })
-                        ],
-                    })
-                ],
-            });
-            var arrayContenido = []
-            for (let i = 0; i < newArray.length; i++) {
-                if (newArray[i].tema) {
-                    console.log("------------------")
-
-                    arrayContenido.push(
-                        new Paragraph({
-                            children: [
-                                new TextRun({
-                                    text: newArray[i].tema,
-                                    color: "008f39",
-                                    size: 40,
-                                    bold: true,
-                                    italics: true
+                                        new Paragraph({
+                                            children: [
+                                                new TextRun({
+                                                    text: "Apartado Postal COM-032, CP 04831",
+                                                    color: "520887",
+                                                    size: 22,
+                                                    bold: true,
+                                                    italics: true
+                                                }),
+                                            ],
+                                            alignment: AlignmentType.CENTER,
+                                        }),
+                                        new Paragraph({
+                                            children: [
+                                                new TextRun({
+                                                    text: "Tel./Fax: +52 (55) 5688 - 9610",
+                                                    color: "520887",
+                                                    size: 22,
+                                                    bold: true,
+                                                    italics: true
+                                                }),
+                                            ],
+                                            alignment: AlignmentType.CENTER,
+                                        }),
+                                        new Paragraph({
+                                            children: [
+                                                new TextRun({
+                                                    text: "librosmexicanos@yahoo.com.mx",
+                                                    color: "520887",
+                                                    size: 22,
+                                                    bold: true,
+                                                    italics: true
+                                                }),
+                                            ],
+                                            alignment: AlignmentType.CENTER,
+                                        }),
+                                        new Paragraph({
+                                            children: [
+                                                new TextRun({
+                                                    text: "Catalog no. " + number,
+                                                    color: "2740f1",
+                                                    size: 22,
+                                                    bold: true,
+                                                    italics: true
+                                                }),
+                                            ],
+                                            alignment: AlignmentType.CENTER,
+                                        }),
+                                        new Paragraph({
+                                            children: [
+                                                new TextRun({
+                                                    text: estado,
+                                                    color: "520887",
+                                                    size: 22,
+                                                    bold: true,
+                                                    italics: true
+                                                }),
+                                            ],
+                                            alignment: AlignmentType.CENTER,
+                                        }),
+                                        new Paragraph({
+                                            children: [
+                                                new TextRun({
+                                                    text: "Retrospective & Latest Publications / March 2021",
+                                                    color: "520887",
+                                                    size: 22,
+                                                    bold: true,
+                                                    italics: true
+                                                }),
+                                            ],
+                                            alignment: AlignmentType.CENTER,
+                                        }),
+                                    ],
                                 })
                             ],
-                            alignment: AlignmentType.CENTER,
                         })
-                    )
-                    for (let j = 0; j < newArray[i].libros.length; j++) {
-                        var textoCont = []
-                        if (newArray[i].libros[j].autor) {
-                            textoCont.push(new TextRun({
-                                text: newArray[i].libros[j].autor + ".",
-                                size: 22,
-                            }))
-                        }
-                        if (newArray[i].libros[j].titulo) {
-                            textoCont.push(new TextRun({
-                                text: " " + newArray[i].libros[j].titulo,
-                                size: 22,
-                                bold: true,
-                            }))
-                        }
-                        if (newArray[i].libros[j].editorial) {
-                            textoCont.push(new TextRun({
-                                text: ", " + newArray[i].libros[j].editorial,
-                                size: 22
-                            }))
-                        }
+                    ],
+                });
+                var arrayContenido = []
+                for (let i = 0; i < newArray.length; i++) {
+                    if (newArray[i].tema) {
+                        console.log("------------------")
 
-                        if (newArray[i].libros[j].placePub) {
-                            textoCont.push(new TextRun({
-                                text: ", " + newArray[i].libros[j].placePub,
-                                size: 22
-                            }))
-                        }
-                        if (newArray[i].libros[j].dimensiones) {
-                            textoCont.push(new TextRun({
-                                text: ", Dimensiones " + newArray[i].libros[j].dimensiones,
-                                size: 22
-                            }))
-                        }
-
-                        if (newArray[i].libros[j].paginas) {
-                            textoCont.push(new TextRun({
-                                text: ", " + newArray[i].libros[j].paginas + " paginas",
-                                size: 22
-                            }))
-                        }
-                        if (newArray[i].libros[j].descripcion) {
-                            textoCont.push(new TextRun({
-                                text: ", " + newArray[i].libros[j].descripcion,
-                                size: 22
-                            }))
-                        }
                         arrayContenido.push(
                             new Paragraph({
-                                children: textoCont
+                                children: [
+                                    new TextRun({
+                                        text: newArray[i].tema,
+                                        color: "008f39",
+                                        size: 40,
+                                        bold: true,
+                                        italics: true
+                                    })
+                                ],
+                                alignment: AlignmentType.CENTER,
                             })
                         )
-                        arrayContenido.push(
-                            new Paragraph({
-                                children: [new TextRun({
-                                    text: "497PB48                      $21.00                           Sent to: None.",
+                        for (let j = 0; j < newArray[i].libros.length; j++) {
+                            var textoCont = []
+                            var textoContImg = []
+                            console.log(newArray[i].libros[j].pathImgPortada)
+                            console.log("newArray[i].libros[j].pathImgPortada")
+                            if (newArray[i].libros[j].pathImgPortada) {
+                                textoContImg.push(
+                                    new ImageRun({
+                                        data: fs.readFileSync("uploads/" + newArray[i].libros[j].pathImgPortada),
+                                        alignment: AlignmentType.CENTER,
+                                        transformation: {
+                                            width: 350,
+                                            height: 350,
+                                        }
+                                    }))
+                            }
+                            if (newArray[i].libros[j].pathImgContraportada) {
+                                textoContImg.push(
+                                    new ImageRun({
+                                        data: fs.readFileSync("uploads/" + newArray[i].libros[j].pathImgContraportada),
+                                        alignment: AlignmentType.CENTER,
+                                        transformation: {
+                                            width: 350,
+                                            height: 350,
+                                        }
+                                    }))
+                            }
+                            if (textoContImg.length > 0) {
+                                arrayContenido.push(
+                                    new Paragraph({
+                                        children: textoContImg
+                                    })
+                                )
+                            }
+                            if (newArray[i].libros[j].autor) {
+                                textoCont.push(new TextRun({
+                                    text: newArray[i].libros[j].autor + ".",
+                                    size: 22,
+                                }))
+                            }
+                            if (newArray[i].libros[j].titulo) {
+                                textoCont.push(new TextRun({
+                                    text: " " + newArray[i].libros[j].titulo,
                                     size: 22,
                                     bold: true,
-                                })]
-                            })
-                        )
+                                }))
+                            }
+                            if (newArray[i].libros[j].editorial) {
+                                textoCont.push(new TextRun({
+                                    text: ", " + newArray[i].libros[j].editorial,
+                                    size: 22
+                                }))
+                            }
+
+                            if (newArray[i].libros[j].placePub) {
+                                textoCont.push(new TextRun({
+                                    text: ", " + newArray[i].libros[j].placePub,
+                                    size: 22
+                                }))
+                            }
+                            if (newArray[i].libros[j].dimensiones) {
+                                textoCont.push(new TextRun({
+                                    text: ", Dimensiones " + newArray[i].libros[j].dimensiones,
+                                    size: 22
+                                }))
+                            }
+
+                            if (newArray[i].libros[j].paginas) {
+                                textoCont.push(new TextRun({
+                                    text: ", " + newArray[i].libros[j].paginas + " paginas",
+                                    size: 22
+                                }))
+                            }
+                            if (newArray[i].libros[j].descripcion) {
+                                textoCont.push(new TextRun({
+                                    text: ", " + newArray[i].libros[j].descripcion,
+                                    size: 22
+                                }))
+                            }
+                            arrayContenido.push(
+                                new Paragraph({
+                                    children: textoCont
+                                })
+                            )
+                            arrayContenido.push(
+                                new Paragraph({
+                                    children: [new TextRun({
+                                        text: "497PB48                      $"+newArray[i].libros[j].precio+"                           ",//,Sent to: None.",
+                                        size: 22,
+                                        bold: true,
+                                    })]
+                                })
+                            )
+                        }
+                        console.log("------------------")
                     }
-                    console.log("------------------")
                 }
-            }
-            const doc = new Document({
-                sections: [
-                    {
-                        children: [
-                            table0
-                        ],
-                    },
-                    {
-                        headers: {
-                            default: new Header({
-                                children: [
-
-                                    new Paragraph({
-                                        children: [
-                                            new TextRun({
-                                                text: "MJSE",
-                                                color: "#009948",
-                                                size: 18,
-                                            })],
-                                        alignment: AlignmentType.CENTER
-                                    }),
-                                    new Paragraph({
-                                        children: [
-                                            new TextRun({
-                                                text: "Catalog no. 493JL  :  Jalisco.	                                                                                                                                  MJSE",
-                                                alignment: AlignmentType.CENTER,
-                                                color: "#009948",
-                                                size: 18,
-                                            })]
-                                    }),
-                                    new Paragraph({
-                                        children: [
-                                            new TextRun({
-                                                text: "Apartado Postal COM-032, C.P. 04831, México, DF.                                             librosmexicanos@yahoo.com.mx",
-                                                alignment: AlignmentType.CENTER,
-                                                color: "#009948",
-                                                size: 18,
-                                            })]
-                                    }),
-                                    /* new Paragraph({
-                                        children: [
-
-                                            new TextRun("Foo Bar corp. "),
-                                            new TextRun({
-                                                children: ["Page Number ", PageNumber.CURRENT],
-                                            }),
-                                            new TextRun({
-                                                children: [" to ", PageNumber.TOTAL_PAGES_IN_SECTION],
-                                            }),
-                                        ],
-                                    }), */
-                                ],
-                            }),
+                const doc = new Document({
+                    sections: [
+                        {
+                            children: [
+                                table0
+                            ],
                         },
-                        children: arrayContenido,
-                    }
-                ],
-            });
-            Packer.toBuffer(doc).then((buffer) => {
-                fs.writeFileSync("/tmp/Catalog-" + number+".docx", buffer);
-                res.download("/tmp/Catalog-" + number+".docx");
-            });
-        } else {
-            res.json(err); //Muestra el error
-        }
-    });
+                        {
+                            headers: {
+                                default: new Header({
+                                    children: [
+
+                                        new Paragraph({
+                                            children: [
+                                                new TextRun({
+                                                    text: "MJSE",
+                                                    color: "#009948",
+                                                    size: 18,
+                                                })],
+                                            alignment: AlignmentType.CENTER
+                                        }),
+                                        new Paragraph({
+                                            children: [
+                                                new TextRun({
+                                                    text: "Catalog no. 493JL  :  Jalisco.	                                                                                                                                  MJSE",
+                                                    alignment: AlignmentType.CENTER,
+                                                    color: "#009948",
+                                                    size: 18,
+                                                })]
+                                        }),
+                                        new Paragraph({
+                                            children: [
+                                                new TextRun({
+                                                    text: "Apartado Postal COM-032, C.P. 04831, México, DF.                                             librosmexicanos@yahoo.com.mx",
+                                                    alignment: AlignmentType.CENTER,
+                                                    color: "#009948",
+                                                    size: 18,
+                                                })]
+                                        }),
+                                        /* new Paragraph({
+                                            children: [
+    
+                                                new TextRun("Foo Bar corp. "),
+                                                new TextRun({
+                                                    children: ["Page Number ", PageNumber.CURRENT],
+                                                }),
+                                                new TextRun({
+                                                    children: [" to ", PageNumber.TOTAL_PAGES_IN_SECTION],
+                                                }),
+                                            ],
+                                        }), */
+                                    ],
+                                }),
+                            },
+                            children: arrayContenido,
+                        }
+                    ],
+                });
+                Packer.toBuffer(doc).then((buffer) => {
+                    fs.writeFileSync("/tmp/Catalog-" + number + ".docx", buffer);
+                    res.download("/tmp/Catalog-" + number + ".docx");
+                });
+            } else {
+                res.json(err); //Muestra el error
+            }
+        });
 });
 
 module.exports = router; //Exporta la ruta
