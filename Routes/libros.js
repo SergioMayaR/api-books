@@ -298,7 +298,7 @@ router.put("/api/libros/:isbn", verifyToken, cpUploadLibros, (req, res) => {
                     const query = "update libros set " + data + " where idLibro =?;";
                     mysqlConection.query(query, array, (err, rows, fields) => {
                       if (!err) {
-                        let body = { status: "Actualizado" }
+                        let body = { status: "Actualizado",dataFiles: req.files,data:req.body}
                         response.success(req, res, false, true, body, 200)
                       } else {
                         console.log(err)
