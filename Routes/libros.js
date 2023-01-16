@@ -243,7 +243,7 @@ router.put("/api/libros/:isbn", verifyToken, cpUploadLibros, (req, res) => {
                     var data = "";
                     var array = [];
                     for (var i in dataBody) {
-                      if (dataBody[i] != "" && dataBody[i] != null && dataBody[i] != "null" ) {
+                      if (dataBody[i] != "" && dataBody[i] != null && dataBody[i] != "null" && dataBody[i] != undefined ) {
                         if (data.length != 0) {
                           data += ",";
                         }
