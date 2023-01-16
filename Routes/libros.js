@@ -49,9 +49,9 @@ router.get("/api/libros/:id", verifyToken, (req, res) => {
             console.log(body)
             //if(body["pathImgPortada"]){
             //const base64 = fs.readFileSync("lgoDoc.png", "base64");
-          //}
-          //console.log(base64)
-            response.success(req, res, false, true,body , 200)
+            //}
+            //console.log(base64)
+            response.success(req, res, false, true, body, 200)
             //res.json(rows[0]); //Muestra el resultado
           } else {
             res.json(err); //Muestra el error
@@ -207,7 +207,7 @@ router.post("/api/addImagelibro/", cpUpload, (req, res) => {
       
     }
   }) */
-  let body = { estatus: "Enviado", path:__dirname,paht1:req.files["image"][0].path }
+  let body = { estatus: "Enviado", path: __dirname, paht1: req.files["image"][0].path }
   response.success(req, res, false, true, body, 200)
 });
 
@@ -217,93 +217,101 @@ router.put("/api/libros/:isbn", verifyToken, cpUploadLibros, (req, res) => {
     if (error) {
       response.error(req, res, true, false, "Prohibido", 403, "Prohibido")
     } else {
-      const { isbn } = req.params;
-      mysqlConection.query(
-        "select * from libros where idLibro = ?",
-        [isbn],
-        (err, dataConsulta, fields) => {
-          if (!err) {
-            if (dataConsulta[0]["pathImgPortada"]) {
-              if (req.files["portada"]) {
-                fs.unlinkSync("uploads/"+dataConsulta[0]["pathImgPortada"])
-              }
+      mysqlConection.query('UPDATE libros SET pathImgPortada= null WHERE pathImgPortada= "null" OR pathImgPortada= ""', (err, rows, fields) => {
+        if (!err) {
+          mysqlConection.query('UPDATE libros SET pathImgContraportada= null WHERE pathImgContraportada= "null" OR pathImgContraportada= ""', (err, rows, fields) => {
+            if (!err) {
+              const { isbn } = req.params;
+              mysqlConection.query(
+                "select * from libros where idLibro = ?",
+                [isbn],
+                (err, dataConsulta, fields) => {
+                  if (!err) {
+                    if (dataConsulta[0]["pathImgPortada"]) {
+                      if (req.files["portada"]) {
+                        fs.unlinkSync("uploads/" + dataConsulta[0]["pathImgPortada"])
+                      }
+                    }
+
+                    if (dataConsulta[0]["pathImgContraportada"]) {
+                      if (req.files["contraportada"]) {
+                        fs.unlinkSync("uploads/" + dataConsulta[0]["pathImgContraportada"])
+                      }
+                    }
+
+                    var dataBody = req.body;
+                    var data = "";
+                    var array = [];
+                    for (var i in dataBody) {
+                      if (dataBody[i]) {
+                        if (data.length != 0) {
+                          data += ",";
+                        }
+                        data += i + "= ?";
+                        array.push(dataBody[i]);
+                      } else if (i == "paginas" || i == "numCopias") {
+                        if (data.length != 0) {
+                          data += ",";
+                        }
+                        data += i + "= ?";
+                        array.push(null);
+
+
+                      } else {
+                        if (data.length != 0) {
+                          data += ",";
+                        }
+                        data += i + "= ?";
+                        array.push("");
+                      }
+                    }
+                    if (req.files) {
+                      console.log("------req.files--------")
+                      if (req.files["portada"]) {
+                        let typeSplit = req.files["portada"][0].originalname.split(".")
+                        let type = typeSplit[typeSplit.length - 1]
+                        let path = "uploads/portada" + isbn + "." + type
+                        fs.renameSync(req.files["portada"][0].path, path)
+                        if (data.length != 0) {
+                          data += ",";
+                        }
+                        data += "pathImgPortada = ?";
+                        array.push("portada" + isbn + "." + type);
+
+                      }
+                      if (req.files["contraportada"]) {
+                        let typeSplit = req.files["contraportada"][0].originalname.split(".")
+                        let type = typeSplit[typeSplit.length - 1]
+                        console.log(type)
+                        let path = "uploads/contraportada" + isbn + "." + type
+
+                        fs.renameSync(req.files["contraportada"][0].path, path)
+                        if (data.length != 0) {
+                          data += ",";
+                        }
+                        data += "pathImgContraportada = ?";
+                        array.push("contraportada" + isbn + "." + type);
+                      }
+                    }
+                    array.push(isbn);
+                    console.log(data)
+                    const query = "update libros set " + data + " where idLibro =?;";
+                    mysqlConection.query(query, array, (err, rows, fields) => {
+                      if (!err) {
+                        let body = { status: "Actualizado" }
+                        response.success(req, res, false, true, body, 200)
+                      } else {
+                        console.log(err)
+                      }
+                    });
+                  } else {
+                    res.json(err); //Muestra el error
+                  }
+                });
             }
-
-            if (dataConsulta[0]["pathImgContraportada"]) {
-              if (req.files["contraportada"]) {
-                fs.unlinkSync("uploads/"+dataConsulta[0]["pathImgContraportada"])
-              }
-            }
-
-            var dataBody = req.body;
-            var data = "";
-            var array = [];
-            for (var i in dataBody) {
-              if (dataBody[i]) {
-                if (data.length != 0) {
-                  data += ",";
-                }
-                data += i + "= ?";
-                array.push(dataBody[i]);
-              } else if (i == "paginas" || i == "numCopias") {
-                if (data.length != 0) {
-                  data += ",";
-                }
-                data += i + "= ?";
-                array.push(null);
-
-
-              } else {
-                if (data.length != 0) {
-                  data += ",";
-                }
-                data += i + "= ?";
-                array.push("");
-              }
-            }
-            if (req.files) {
-              console.log("------req.files--------")
-              if (req.files["portada"]) {
-                let typeSplit = req.files["portada"][0].originalname.split(".")
-                let type = typeSplit[typeSplit.length - 1]
-                let path = "uploads/portada" + isbn + "." + type
-                fs.renameSync(req.files["portada"][0].path, path)
-                if (data.length != 0) {
-                  data += ",";
-                }
-                data += "pathImgPortada = ?";
-                array.push("portada"+ isbn + "." + type);
-
-              }
-              if (req.files["contraportada"]) {
-                let typeSplit = req.files["contraportada"][0].originalname.split(".")
-                let type = typeSplit[typeSplit.length - 1]
-                console.log(type)
-                let path = "uploads/contraportada" + isbn + "." + type
-                
-                fs.renameSync(req.files["contraportada"][0].path, path)
-                if (data.length != 0) {
-                  data += ",";
-                }
-                data += "pathImgContraportada = ?";
-                array.push("contraportada"+ isbn + "." + type);
-              }
-            }
-            array.push(isbn);
-            console.log(data)
-            const query = "update libros set " + data + " where idLibro =?;";
-            mysqlConection.query(query, array, (err, rows, fields) => {
-              if (!err) {
-                let body = { status: "Actualizado" }
-                response.success(req, res, false, true, body, 200)
-              } else {
-                console.log(err)
-              }
-            });
-          } else {
-            res.json(err); //Muestra el error
-          }
-        });
+          })
+        }
+      })
     }
   })
 });
