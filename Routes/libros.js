@@ -243,26 +243,28 @@ router.put("/api/libros/:isbn", verifyToken, cpUploadLibros, (req, res) => {
                     var data = "";
                     var array = [];
                     for (var i in dataBody) {
-                      if (dataBody[i] != "" && dataBody[i] != null && dataBody[i] != "null" && dataBody[i] != undefined ) {
-                        if (data.length != 0) {
-                          data += ",";
-                        }
-                        data += i + "= ?";
-                        array.push(dataBody[i]);
-                      } else if (i == "paginas" || i == "numCopias") {
-                        if (data.length != 0) {
-                          data += ",";
-                        }
-                        data += i + "= ?";
-                        array.push(null);
+                      if (i != "pathImgContraportada" && i != "pathImgPortada") {
+                        if (dataBody[i] != "" && dataBody[i] != null && dataBody[i] != "null" && dataBody[i] != undefined) {
+                          if (data.length != 0) {
+                            data += ",";
+                          }
+                          data += i + "= ?";
+                          array.push(dataBody[i]);
+                        } else if (i == "paginas" || i == "numCopias") {
+                          if (data.length != 0) {
+                            data += ",";
+                          }
+                          data += i + "= ?";
+                          array.push(null);
 
 
-                      } else {
-                        if (data.length != 0) {
-                          data += ",";
+                        } else {
+                          if (data.length != 0) {
+                            data += ",";
+                          }
+                          data += i + "= ?";
+                          array.push("");
                         }
-                        data += i + "= ?";
-                        array.push("");
                       }
                     }
                     if (req.files) {
@@ -298,7 +300,7 @@ router.put("/api/libros/:isbn", verifyToken, cpUploadLibros, (req, res) => {
                     const query = "update libros set " + data + " where idLibro =?;";
                     mysqlConection.query(query, array, (err, rows, fields) => {
                       if (!err) {
-                        let body = { status: "Actualizado",dataFiles: req.files,data:req.body}
+                        let body = { status: "Actualizado", dataFiles: req.files, data: req.body }
                         response.success(req, res, false, true, body, 200)
                       } else {
                         console.log(err)
