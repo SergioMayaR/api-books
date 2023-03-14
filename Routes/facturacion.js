@@ -420,7 +420,12 @@ router.get("/api/marc21/:id", verifyTokenParas, (req, res) => {
                             if(!libro.descripcion){
                                 libro.descripcion=""
                             }
-                            dataMarc[7] = libro.descripcion ? dataMarc[7] + libro.descripcion+ '.' : dataMarc[7] + '';
+
+                            //dataMarc[7] = libro.descripcion ? dataMarc[7] + libro.descripcion+ '.' : dataMarc[7] + '';
+                            dataMarc[7] = libro.paginas ? dataMarc[7] + libro.paginas+ '.' : dataMarc[7] + ' ';
+                            dataMarc[7] = libro.nota ? dataMarc[7] + libro.nota+ '.' : dataMarc[7] + ' ';
+                            dataMarc[7] = libro.dimensiones ? dataMarc[7] + libro.dimensiones+ '.' : dataMarc[7] + ' ';
+                            
                             //dataMarc[10] = libro.anio ? dataMarc[10] + libro.anio : dataMarc[10] + '';
                             //dataMarc[11] = libro.nota ? dataMarc[11] + libro.nota : dataMarc[11] + '';
                             dataMarc[8] = dataMarc[8] + '\\\\$a' + moment(libro.fecha_cotizacion).format("YYYYMMDD") + '$f' + newArray[0].id_cotizacion + "$s" + libro.precio;
