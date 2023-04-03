@@ -386,10 +386,9 @@ router.get("/api/marc21/:id", verifyTokenParas, (req, res) => {
                         console.log(newArray[0]["libros"])
                         for (let i = 0; i < libros.length; i++) {
                             let libro = libros[i];
-                            libro.titulo=libro.titulo.replace(/ el /g,"").replace(/ EL /g,"").replace(/ El /g,"")
-                            libro.titulo=libro.titulo.replace(/ LA /g,"").replace(/ La /g,"").replace(/ la /g,"")
-                            libro.titulo=libro.titulo.replace(/ LAS /g,"").replace(/ Las /g,"").replace(/ las /g,"").replace(/ LAS /g,"")
-                            libro.titulo=libro.titulo.replace(/ LOS /g,"").replace(/ Los /g,"").replace(/ los /g,"").replace(/ LOS /g,"")
+                            const regex = /^(El\s|EL\s|el\s|La\s|la\s|LA\s|Las\s|LAS\s|las\s|los\s|Los\s|LOS\s)/g
+                            libro.titulo=libro.titulo.replace(regex,"")
+                            
                             let dataMarc = [
                                 ['=LDR 00457nam a2200121Ia 4500'], //0 
                                 ['\n=008  220425?'+moment().format("YYYY")+'\\\\\\\\MX\\\\\\\\\\\\\\\\\\\\\\\\000\\0\\SPA\\d'], // 1
@@ -428,7 +427,7 @@ router.get("/api/marc21/:id", verifyTokenParas, (req, res) => {
                             
                             //dataMarc[10] = libro.anio ? dataMarc[10] + libro.anio : dataMarc[10] + '';
                             //dataMarc[11] = libro.nota ? dataMarc[11] + libro.nota : dataMarc[11] + '';
-                            dataMarc[8] = dataMarc[8] + '\\\\$a' + moment(libro.fecha_cotizacion).format("YYYYMMDD") + '$f' + newArray[0].id_cotizacion + "$s" + libro.precio;
+                            dataMarc[8] = dataMarc[8] + '\\\\$b' + moment(libro.fecha_cotizacion).format("YYYYMMDD") + '$f' + newArray[0].id_cotizacion + "$s" + libro.precio;
 
                             if(!libro.descripcion){
                                 dataMarc.splice(7,1)
